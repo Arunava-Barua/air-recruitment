@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Shield, User, Settings, LogOut, Home } from "lucide-react"
+import { Shield, User, Settings, LogOut, Building2, Search } from "lucide-react"
 
 export function CandidateHeader() {
   return (
@@ -21,14 +21,20 @@ export function CandidateHeader() {
               <Shield className="w-8 h-8 text-blue-600" />
               <span className="text-xl font-bold text-gray-900">Credify</span>
             </Link>
-            <span className="text-sm text-gray-500">Candidate Portal</span>
+            <span className="text-sm text-gray-500">Profile</span>
           </div>
 
           <div className="flex items-center space-x-4">
             <Button variant="ghost" asChild>
-              <Link href="/">
-                <Home className="w-4 h-4 mr-2" />
-                Home
+              <Link href="/recruiter">
+                <Search className="w-4 h-4 mr-2" />
+                Explorer
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/employer">
+                <Building2 className="w-4 h-4 mr-2" />
+                Manage Credentials
               </Link>
             </Button>
 
@@ -45,22 +51,22 @@ export function CandidateHeader() {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">Sarah Johnson</p>
-                    <p className="text-xs leading-none text-muted-foreground">sarah@example.com</p>
+                    <p className="text-xs leading-none text-muted-foreground font-mono">0x742d...8D4</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span>Profile Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                  <span>Preferences</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
+                  <span>Disconnect Wallet</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
