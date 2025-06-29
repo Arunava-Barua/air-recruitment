@@ -24,6 +24,7 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
+  X,
 } from "lucide-react"
 import { CandidateHeader } from "@/components/candidate-header"
 
@@ -119,11 +120,59 @@ const credentialTypes = {
   employment: ["Employment Verification", "Role Certificate", "Performance Review"],
 }
 
+const incomingRequests = [
+  {
+    id: 1,
+    employer: "TechCorp Inc.",
+    credentialType: "Employment Verification",
+    requestDate: "2024-01-20",
+    details: {
+      role: "Senior Software Engineer",
+      department: "Engineering",
+      startDate: "2022-07-01",
+      endDate: "2024-01-15",
+      salary: "$120,000 - $140,000",
+      achievements:
+        "Led team of 5 engineers, Increased system performance by 40%, Implemented microservices architecture",
+      performanceRating: "Outstanding (5/5)",
+    },
+  },
+  {
+    id: 2,
+    employer: "StartupXYZ",
+    credentialType: "Role Certificate",
+    requestDate: "2024-01-18",
+    details: {
+      role: "Full Stack Developer",
+      department: "Product Development",
+      startDate: "2020-03-15",
+      endDate: "2022-06-30",
+      salary: "$85,000 - $95,000",
+      achievements: "Built entire frontend architecture, Reduced load times by 60%",
+    },
+  },
+]
+
 export default function CandidatePage() {
   const [selectedOrg, setSelectedOrg] = useState("")
   const [selectedCredType, setSelectedCredType] = useState("")
   const [privacySettings, setPrivacySettings] = useState<Record<string, string>>({})
   const { toast } = useToast()
+
+  const handleAcceptRequest = (requestId: number) => {
+    toast({
+      title: "Credential request accepted!",
+      description: "Credential has been issued to your wallet via AIR Kit",
+    })
+  }
+
+  const handleRejectRequest = (requestId: number) => {
+    toast({
+      title: "Credential request rejected",
+      description: "The employer has been notified of your decision",
+      variant: "destructive",
+    })
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -254,6 +303,90 @@ export default function CandidatePage() {
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Incoming Credential Requests */}
+        <Card className="mb-8 shadow-sm border-0">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <AlertCircle className="w-5 h-5 mr-2 text-orange-600" />📬 Incoming Credential Requests
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {incomingRequests.map((request) => (
+              <Card key={request.id} className="border border-orange-200 bg-orange-50">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h3 className="font-semibold text-gray-900">{request.credentialType}</h3>
+                        <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+                          <Clock className="w-3 h-3 mr-1" />
+                          Pending Review
+                        </Badge>
+                      </div>
+                      <p className="text-gray-600 mb-2">
+                        From: <strong>{request.employer}</strong>
+                      </p>
+                      <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-3">
+                        <div>
+                          <span className="font-medium">Role:</span> {request.details.role}
+                        </div>
+                        <div>
+                          <span className="font-medium">Department:</span> {request.details.department}
+                        </div>
+                        <div>
+                          <span className="font-medium">Duration:</span> {request.details.startDate} to{" "}
+                          {request.details.endDate || "Present"}
+                        </div>
+                        {request.details.salary && (
+                          <div>
+                            <span className="font-medium">Salary:</span> {request.details.salary}
+                          </div>
+                        )}
+                      </div>
+                      {request.details.achievements && (
+                        <div className="text-sm text-gray-600 mb-3">
+                          <span className="font-medium">Achievements:</span> {request.details.achievements}
+                        </div>
+                      )}
+                      {request.details.performanceRating && (
+                        <div className="text-sm text-gray-600 mb-3">
+                          <span className="font-medium">Performance Rating:</span> {request.details.performanceRating}
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-400">Requested on: {request.requestDate}</p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-3 mt-4">
+                    <Button onClick={() => handleAcceptRequest(request.id)} className="bg-green-600 hover:bg-green-700">
+                      <CheckCircle className="w-4 h-4 mr-1" />
+                      Accept & Issue
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleRejectRequest(request.id)}
+                      className="border-red-200 text-red-600 hover:bg-red-50"
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Reject
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Eye className="w-4 h-4 mr-1" />
+                      Preview
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {incomingRequests.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p>No pending credential requests</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
