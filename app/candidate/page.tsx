@@ -1,0 +1,446 @@
+"use client"
+
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
+import {
+  Shield,
+  GraduationCap,
+  Briefcase,
+  Wallet,
+  Plus,
+  Download,
+  Send,
+  Github,
+  Linkedin,
+  Copy,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+} from "lucide-react"
+import { CandidateHeader } from "@/components/candidate-header"
+
+// Mock data
+const candidateData = {
+  name: "Sarah Johnson",
+  avatar: "/placeholder.svg?height=100&width=100",
+  walletAddress: "0x742d35Cc6634C0532925a3b8D4C0532925a3b8D4",
+  linkedin: "linkedin.com/in/sarahjohnson",
+  github: "github.com/sarahjohnson",
+}
+
+const educationCredentials = [
+  {
+    id: 1,
+    institution: "Stanford University",
+    degree: "Master of Computer Science",
+    issueDate: "2022-06-15",
+    expiry: "2027-06-15",
+    status: "verified",
+    issuer: "Stanford University (DID: did:web:stanford.edu)",
+    privacy: "public",
+  },
+  {
+    id: 2,
+    institution: "UC Berkeley",
+    degree: "Bachelor of Science in Computer Science",
+    issueDate: "2020-05-20",
+    expiry: "2025-05-20",
+    status: "verified",
+    issuer: "UC Berkeley (DID: did:web:berkeley.edu)",
+    privacy: "recruiters",
+  },
+]
+
+const workCredentials = [
+  {
+    id: 1,
+    employer: "Google",
+    role: "Senior Software Engineer",
+    duration: "2022-07 to 2024-01",
+    status: "verified",
+    issuer: "Google Inc. (DID: did:web:google.com)",
+    privacy: "public",
+  },
+  {
+    id: 2,
+    employer: "Meta",
+    role: "Software Engineer",
+    duration: "2020-08 to 2022-06",
+    status: "pending",
+    issuer: "Meta Platforms (DID: did:web:meta.com)",
+    privacy: "recruiters",
+  },
+]
+
+const walletCredentials = [
+  {
+    id: 1,
+    type: "Education",
+    title: "Master of Computer Science",
+    issuer: "Stanford University",
+    status: "verified",
+    issueDate: "2022-06-15",
+  },
+  {
+    id: 2,
+    type: "Employment",
+    title: "Senior Software Engineer",
+    issuer: "Google",
+    status: "verified",
+    issueDate: "2022-07-01",
+  },
+  {
+    id: 3,
+    type: "Certification",
+    title: "AWS Solutions Architect",
+    issuer: "Amazon Web Services",
+    status: "verified",
+    issueDate: "2023-03-15",
+  },
+]
+
+const organizations = [
+  { id: 1, name: "Stanford University", type: "education" },
+  { id: 2, name: "Google", type: "employment" },
+  { id: 3, name: "Meta", type: "employment" },
+  { id: 4, name: "Amazon", type: "employment" },
+]
+
+const credentialTypes = {
+  education: ["Degree Certificate", "Course Completion", "Academic Transcript"],
+  employment: ["Employment Verification", "Role Certificate", "Performance Review"],
+}
+
+export default function CandidatePage() {
+  const [selectedOrg, setSelectedOrg] = useState("")
+  const [selectedCredType, setSelectedCredType] = useState("")
+  const [privacySettings, setPrivacySettings] = useState<Record<string, string>>({})
+  const { toast } = useToast()
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "verified":
+        return <CheckCircle className="w-4 h-4 text-green-600" />
+      case "pending":
+        return <Clock className="w-4 h-4 text-yellow-600" />
+      case "expired":
+        return <AlertCircle className="w-4 h-4 text-red-600" />
+      default:
+        return <AlertCircle className="w-4 h-4 text-gray-400" />
+    }
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "verified":
+        return (
+          <Badge className="bg-green-100 text-green-800 border-green-200">
+            <Shield className="w-3 h-3 mr-1" />
+            Verified via AIR Kit
+          </Badge>
+        )
+      case "pending":
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">Pending</Badge>
+      case "expired":
+        return <Badge className="bg-red-100 text-red-800 border-red-200">Expired</Badge>
+      default:
+        return <Badge variant="secondary">Unknown</Badge>
+    }
+  }
+
+  const getPrivacyIcon = (privacy: string) => {
+    switch (privacy) {
+      case "public":
+        return <Eye className="w-4 h-4 text-blue-600" />
+      case "recruiters":
+        return <EyeOff className="w-4 h-4 text-yellow-600" />
+      case "private":
+        return <EyeOff className="w-4 h-4 text-red-600" />
+      default:
+        return <Eye className="w-4 h-4 text-gray-400" />
+    }
+  }
+
+  const copyWalletAddress = () => {
+    navigator.clipboard.writeText(candidateData.walletAddress)
+    toast({
+      title: "Wallet address copied",
+      description: "Address copied to clipboard",
+    })
+  }
+
+  const handleCredentialRequest = () => {
+    if (!selectedOrg || !selectedCredType) {
+      toast({
+        title: "Missing information",
+        description: "Please select both organization and credential type",
+        variant: "destructive",
+      })
+      return
+    }
+
+    toast({
+      title: "Credential request sent",
+      description: `Request sent to ${organizations.find((org) => org.id.toString() === selectedOrg)?.name}`,
+    })
+
+    setSelectedOrg("")
+    setSelectedCredType("")
+  }
+
+  const handlePresentCredential = (credentialId: number) => {
+    toast({
+      title: "Credential presented",
+      description: "Verifiable credential shared successfully via AIR Kit",
+    })
+  }
+
+  const handleDownloadCredential = (credentialId: number) => {
+    toast({
+      title: "Credential downloaded",
+      description: "VC file downloaded to your device",
+    })
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <CandidateHeader />
+
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Profile Header */}
+        <Card className="mb-8 shadow-sm border-0">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-6">
+              <Avatar className="w-24 h-24">
+                <AvatarImage src={candidateData.avatar || "/placeholder.svg"} alt={candidateData.name} />
+                <AvatarFallback className="text-xl">SJ</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{candidateData.name}</h1>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Wallet className="w-4 h-4 text-gray-500" />
+                    <code className="text-sm bg-gray-100 px-2 py-1 rounded font-mono">
+                      {candidateData.walletAddress}
+                    </code>
+                    <Button variant="ghost" size="sm" onClick={copyWalletAddress}>
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <a
+                      href={`https://${candidateData.linkedin}`}
+                      className="flex items-center space-x-1 text-blue-600 hover:text-blue-800"
+                    >
+                      <Linkedin className="w-4 h-4" />
+                      <span className="text-sm">LinkedIn</span>
+                    </a>
+                    <a
+                      href={`https://${candidateData.github}`}
+                      className="flex items-center space-x-1 text-gray-700 hover:text-gray-900"
+                    >
+                      <Github className="w-4 h-4" />
+                      <span className="text-sm">GitHub</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            {/* Education Credentials */}
+            <Card className="shadow-sm border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <GraduationCap className="w-5 h-5 mr-2 text-blue-600" />📚 Education Credentials
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {educationCredentials.map((credential) => (
+                  <Card key={credential.id} className="border border-gray-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">{credential.degree}</h3>
+                          <p className="text-gray-600">{credential.institution}</p>
+                          <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                            <span>Issued: {credential.issueDate}</span>
+                            <span>Expires: {credential.expiry}</span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1">{credential.issuer}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {getPrivacyIcon(credential.privacy)}
+                          {getStatusIcon(credential.status)}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-4">
+                        {getStatusBadge(credential.status)}
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm" onClick={() => handlePresentCredential(credential.id)}>
+                            <Send className="w-4 h-4 mr-1" />
+                            Present
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleDownloadCredential(credential.id)}>
+                            <Download className="w-4 h-4 mr-1" />
+                            Download
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Work Credentials */}
+            <Card className="shadow-sm border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Briefcase className="w-5 h-5 mr-2 text-green-600" />💼 Work Credentials
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {workCredentials.map((credential) => (
+                  <Card key={credential.id} className="border border-gray-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">{credential.role}</h3>
+                          <p className="text-gray-600">{credential.employer}</p>
+                          <p className="text-sm text-gray-500 mt-1">{credential.duration}</p>
+                          <p className="text-xs text-gray-400 mt-1">{credential.issuer}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {getPrivacyIcon(credential.privacy)}
+                          {getStatusIcon(credential.status)}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-4">
+                        {getStatusBadge(credential.status)}
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePresentCredential(credential.id)}
+                            disabled={credential.status !== "verified"}
+                          >
+                            <Send className="w-4 h-4 mr-1" />
+                            Present
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDownloadCredential(credential.id)}
+                            disabled={credential.status !== "verified"}
+                          >
+                            <Download className="w-4 h-4 mr-1" />
+                            Download
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-8">
+            {/* My Wallet Credentials */}
+            <Card className="shadow-sm border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Wallet className="w-5 h-5 mr-2 text-purple-600" />🔐 My Wallet Credentials
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {walletCredentials.map((credential) => (
+                  <div key={credential.id} className="p-3 border border-gray-200 rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-sm text-gray-900">{credential.title}</h4>
+                        <p className="text-xs text-gray-600">{credential.issuer}</p>
+                        <p className="text-xs text-gray-400">{credential.issueDate}</p>
+                      </div>
+                      {getStatusIcon(credential.status)}
+                    </div>
+                    <Badge className="mt-2 text-xs bg-gray-100 text-gray-700">{credential.type}</Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Request Credential */}
+            <Card className="shadow-sm border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Plus className="w-5 h-5 mr-2 text-blue-600" />➕ Request Credential
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="organization">Organization</Label>
+                  <Select value={selectedOrg} onValueChange={setSelectedOrg}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select organization" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {organizations.map((org) => (
+                        <SelectItem key={org.id} value={org.id.toString()}>
+                          {org.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedOrg && (
+                  <div className="space-y-2">
+                    <Label htmlFor="credentialType">Credential Type</Label>
+                    <Select value={selectedCredType} onValueChange={setSelectedCredType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select credential type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectedOrg &&
+                          credentialTypes[
+                            organizations.find((org) => org.id.toString() === selectedOrg)
+                              ?.type as keyof typeof credentialTypes
+                          ]?.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <Button
+                  onClick={handleCredentialRequest}
+                  className="w-full"
+                  disabled={!selectedOrg || !selectedCredType}
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Submit Request
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
