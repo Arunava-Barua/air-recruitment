@@ -11,34 +11,40 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/hooks/use-toast"
-import { Shield, FileText, TrendingUp, Check, X, RotateCcw, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import { Shield, FileText, TrendingUp, RotateCcw, Clock, CheckCircle, AlertCircle } from "lucide-react"
 import { EmployerHeader } from "@/components/employer-header"
 
 // Mock data
-const credentialRequests = [
+const outgoingRequests = [
   {
     id: 1,
-    candidateName: "John Smith",
-    walletAddress: "0x123...abc",
+    employeeName: "John Smith",
+    employeeWallet: "0x123...abc",
     credentialType: "Employment Verification",
     requestDate: "2024-01-15",
     status: "pending",
+    role: "Senior Software Engineer",
+    department: "Engineering",
   },
   {
     id: 2,
-    candidateName: "Emily Davis",
-    walletAddress: "0x456...def",
+    employeeName: "Emily Davis",
+    employeeWallet: "0x456...def",
     credentialType: "Role Certificate",
     requestDate: "2024-01-14",
-    status: "pending",
+    status: "accepted",
+    role: "Product Manager",
+    department: "Product",
   },
   {
     id: 3,
-    candidateName: "Michael Chen",
-    walletAddress: "0x789...ghi",
+    employeeName: "Michael Chen",
+    employeeWallet: "0x789...ghi",
     credentialType: "Performance Review",
     requestDate: "2024-01-13",
-    status: "approved",
+    status: "rejected",
+    role: "Data Scientist",
+    department: "Analytics",
   },
 ]
 
@@ -66,6 +72,11 @@ export default function EmployerPage() {
       startDate: "",
       endDate: "",
       department: "",
+      employeeName: "",
+      salary: "",
+      achievements: "",
+      includePerformance: false,
+      performanceRating: "",
     },
     expirable: true,
     revokable: true,
@@ -73,23 +84,8 @@ export default function EmployerPage() {
   const [isIssuing, setIsIssuing] = useState(false)
   const { toast } = useToast()
 
-  const handleApproveRequest = (requestId: number) => {
-    toast({
-      title: "Request approved",
-      description: "Credential will be issued via AIR Kit",
-    })
-  }
-
-  const handleRejectRequest = (requestId: number) => {
-    toast({
-      title: "Request rejected",
-      description: "Candidate has been notified",
-      variant: "destructive",
-    })
-  }
-
   const handleIssueCredential = async () => {
-    if (!issuanceForm.candidateWallet || !issuanceForm.credentialType) {
+    if (!issuanceForm.candidateWallet || !issuanceForm.credentialType || !issuanceForm.metadata.employeeName) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields",
@@ -100,12 +96,12 @@ export default function EmployerPage() {
 
     setIsIssuing(true)
 
-    // Simulate AIR Kit integration
+    // Simulate sending credential request
     setTimeout(() => {
       setIsIssuing(false)
       toast({
-        title: "Credential issued successfully!",
-        description: "Verifiable credential has been issued via AIR Kit",
+        title: "Credential request sent successfully!",
+        description: `Request sent to ${issuanceForm.metadata.employeeName} for review and acceptance`,
       })
 
       // Reset form
@@ -117,6 +113,11 @@ export default function EmployerPage() {
           startDate: "",
           endDate: "",
           department: "",
+          employeeName: "",
+          salary: "",
+          achievements: "",
+          includePerformance: false,
+          performanceRating: "",
         },
         expirable: true,
         revokable: true,
@@ -130,21 +131,21 @@ export default function EmployerPage() {
         return (
           <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
             <Clock className="w-3 h-3 mr-1" />
-            Pending
+            Awaiting Employee Response
           </Badge>
         )
-      case "approved":
+      case "accepted":
         return (
           <Badge className="bg-green-100 text-green-800 border-green-200">
             <CheckCircle className="w-3 h-3 mr-1" />
-            Approved
+            Accepted & Issued
           </Badge>
         )
       case "rejected":
         return (
           <Badge className="bg-red-100 text-red-800 border-red-200">
             <AlertCircle className="w-3 h-3 mr-1" />
-            Rejected
+            Rejected by Employee
           </Badge>
         )
       default:
@@ -157,68 +158,45 @@ export default function EmployerPage() {
       <EmployerHeader />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <Tabs defaultValue="requests" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="requests">Credential Requests</TabsTrigger>
-            <TabsTrigger value="issue">Issue New Credential</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <Tabs defaultValue="outgoing" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="outgoing">Outgoing Requests</TabsTrigger>
+            <TabsTrigger value="issue">Send New Request</TabsTrigger>
           </TabsList>
 
           {/* Credential Requests Tab */}
-          <TabsContent value="requests">
+          <TabsContent value="outgoing">
             <Card className="shadow-sm border-0">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <FileText className="w-5 h-5 mr-2 text-blue-600" />
-                  Incoming Credential Requests
+                  Outgoing Credential Requests
                 </CardTitle>
-                <CardDescription>Review and approve credential requests from candidates</CardDescription>
+                <CardDescription>Track the status of credential requests sent to employees</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Candidate Name</TableHead>
+                      <TableHead>Employee Name</TableHead>
                       <TableHead>Wallet Address</TableHead>
+                      <TableHead>Role</TableHead>
                       <TableHead>Credential Type</TableHead>
                       <TableHead>Request Date</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {credentialRequests.map((request) => (
+                    {outgoingRequests.map((request) => (
                       <TableRow key={request.id}>
-                        <TableCell className="font-medium">{request.candidateName}</TableCell>
+                        <TableCell className="font-medium">{request.employeeName}</TableCell>
                         <TableCell>
-                          <code className="text-sm bg-gray-100 px-2 py-1 rounded">{request.walletAddress}</code>
+                          <code className="text-sm bg-gray-100 px-2 py-1 rounded">{request.employeeWallet}</code>
                         </TableCell>
+                        <TableCell>{request.role}</TableCell>
                         <TableCell>{request.credentialType}</TableCell>
                         <TableCell>{request.requestDate}</TableCell>
                         <TableCell>{getStatusBadge(request.status)}</TableCell>
-                        <TableCell>
-                          {request.status === "pending" && (
-                            <div className="flex space-x-2">
-                              <Button
-                                size="sm"
-                                onClick={() => handleApproveRequest(request.id)}
-                                className="bg-green-600 hover:bg-green-700"
-                              >
-                                <Check className="w-4 h-4 mr-1" />
-                                Approve
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleRejectRequest(request.id)}
-                                className="border-red-200 text-red-600 hover:bg-red-50"
-                              >
-                                <X className="w-4 h-4 mr-1" />
-                                Reject
-                              </Button>
-                            </div>
-                          )}
-                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -227,24 +205,24 @@ export default function EmployerPage() {
             </Card>
           </TabsContent>
 
-          {/* Issue New Credential Tab */}
+          {/* Send Credential Request Tab */}
           <TabsContent value="issue">
             <Card className="shadow-sm border-0">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Shield className="w-5 h-5 mr-2 text-green-600" />
-                  Issue New Credential via AIR Kit
+                  Send Credential Request to Employee
                 </CardTitle>
-                <CardDescription>Create and issue verifiable credentials to candidates</CardDescription>
+                <CardDescription>Send a credential request to an employee for them to accept and issue</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="candidateWallet">Candidate Wallet/DID *</Label>
+                      <Label htmlFor="employeeWallet">Employee Wallet/Email *</Label>
                       <Input
-                        id="candidateWallet"
-                        placeholder="0x... or did:web:..."
+                        id="employeeWallet"
+                        placeholder="0x... or employee@company.com"
                         value={issuanceForm.candidateWallet}
                         onChange={(e) => setIssuanceForm({ ...issuanceForm, candidateWallet: e.target.value })}
                       />
@@ -264,12 +242,28 @@ export default function EmployerPage() {
                           <SelectItem value="role">Role Certificate</SelectItem>
                           <SelectItem value="performance">Performance Review</SelectItem>
                           <SelectItem value="training">Training Completion</SelectItem>
+                          <SelectItem value="promotion">Promotion Certificate</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="role">Role/Position</Label>
+                      <Label htmlFor="employeeName">Employee Name *</Label>
+                      <Input
+                        id="employeeName"
+                        placeholder="e.g., John Smith"
+                        value={issuanceForm.metadata.employeeName || ""}
+                        onChange={(e) =>
+                          setIssuanceForm({
+                            ...issuanceForm,
+                            metadata: { ...issuanceForm.metadata, employeeName: e.target.value },
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Role/Position *</Label>
                       <Input
                         id="role"
                         placeholder="e.g., Senior Software Engineer"
@@ -284,7 +278,7 @@ export default function EmployerPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="department">Department</Label>
+                      <Label htmlFor="department">Department *</Label>
                       <Input
                         id="department"
                         placeholder="e.g., Engineering"
@@ -302,7 +296,7 @@ export default function EmployerPage() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="startDate">Start Date</Label>
+                        <Label htmlFor="startDate">Start Date *</Label>
                         <Input
                           id="startDate"
                           type="date"
@@ -331,49 +325,112 @@ export default function EmployerPage() {
                       </div>
                     </div>
 
+                    <div className="space-y-2">
+                      <Label htmlFor="salary">Salary Range (Optional)</Label>
+                      <Input
+                        id="salary"
+                        placeholder="e.g., $80,000 - $120,000"
+                        value={issuanceForm.metadata.salary || ""}
+                        onChange={(e) =>
+                          setIssuanceForm({
+                            ...issuanceForm,
+                            metadata: { ...issuanceForm.metadata, salary: e.target.value },
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="achievements">Key Achievements (Optional)</Label>
+                      <textarea
+                        id="achievements"
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        rows={3}
+                        placeholder="e.g., Led team of 5 engineers, Increased system performance by 40%"
+                        value={issuanceForm.metadata.achievements || ""}
+                        onChange={(e) =>
+                          setIssuanceForm({
+                            ...issuanceForm,
+                            metadata: { ...issuanceForm.metadata, achievements: e.target.value },
+                          })
+                        }
+                      />
+                    </div>
+
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <Label className="text-base">Expirable Credential</Label>
-                          <p className="text-sm text-gray-500">Set an expiration date for this credential</p>
+                          <Label className="text-base">Include Performance Rating</Label>
+                          <p className="text-sm text-gray-500">Add performance evaluation to credential</p>
                         </div>
                         <Switch
-                          checked={issuanceForm.expirable}
-                          onCheckedChange={(checked) => setIssuanceForm({ ...issuanceForm, expirable: checked })}
+                          checked={issuanceForm.metadata.includePerformance || false}
+                          onCheckedChange={(checked) =>
+                            setIssuanceForm({
+                              ...issuanceForm,
+                              metadata: { ...issuanceForm.metadata, includePerformance: checked },
+                            })
+                          }
                         />
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label className="text-base">Revokable Credential</Label>
-                          <p className="text-sm text-gray-500">Allow this credential to be revoked if needed</p>
+                      {issuanceForm.metadata.includePerformance && (
+                        <div className="space-y-2">
+                          <Label htmlFor="performanceRating">Performance Rating</Label>
+                          <Select
+                            value={issuanceForm.metadata.performanceRating || ""}
+                            onValueChange={(value) =>
+                              setIssuanceForm({
+                                ...issuanceForm,
+                                metadata: { ...issuanceForm.metadata, performanceRating: value },
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select rating" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="outstanding">Outstanding (5/5)</SelectItem>
+                              <SelectItem value="exceeds">Exceeds Expectations (4/5)</SelectItem>
+                              <SelectItem value="meets">Meets Expectations (3/5)</SelectItem>
+                              <SelectItem value="below">Below Expectations (2/5)</SelectItem>
+                              <SelectItem value="unsatisfactory">Unsatisfactory (1/5)</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
-                        <Switch
-                          checked={issuanceForm.revokable}
-                          onCheckedChange={(checked) => setIssuanceForm({ ...issuanceForm, revokable: checked })}
-                        />
-                      </div>
+                      )}
                     </div>
 
                     <Button
                       onClick={handleIssueCredential}
-                      disabled={isIssuing}
+                      disabled={isIssuing || !issuanceForm.candidateWallet || !issuanceForm.credentialType}
                       className="w-full bg-green-600 hover:bg-green-700"
                       size="lg"
                     >
                       {isIssuing ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Issuing via AIR Kit...
+                          Sending Request...
                         </>
                       ) : (
                         <>
                           <Shield className="w-4 h-4 mr-2" />
-                          Issue via AIR Kit
+                          Send Credential Request
                         </>
                       )}
                     </Button>
                   </div>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-900 mb-2">How it works:</h4>
+                  <ol className="text-sm text-blue-800 space-y-1">
+                    <li>1. Fill in the employee details and credential information</li>
+                    <li>2. Send the request to the employee's wallet/email</li>
+                    <li>3. Employee reviews and accepts/rejects the credential request</li>
+                    <li>4. Once accepted, the credential is issued to their wallet</li>
+                    <li>5. Future employers can verify the credential directly</li>
+                  </ol>
                 </div>
               </CardContent>
             </Card>
