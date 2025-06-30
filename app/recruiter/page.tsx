@@ -64,10 +64,10 @@ const LOCALE = "en";
 
 // AIR Verification Configuration
 const AIR_CONFIG = {
-  apiKey: "RTAaMFKMto9zF094yPTeXEgmm2KQvlHQoCxjcgm0",
+  apiKey: "YSVgdqWJV2RDYJCdRNprkKP3FZqQnomYoPpO1nGF",
   verifierDid:
     "did:key:Xwp8EVHZ3UQgtZ7LZp6FbAe1sRAKNCbM16692sqAjqQx6b31GJkXcMGoveRNQLXekw28xmCBUA9b7GtcNcV7cxkf6Vv",
-  programId: "c21hi031dmpll0012916hZ",
+  programId: "c21hi030di5ex00b2916hU",
   partnerId: "67264f2e-99a9-4ee0-b23b-6a0f96bb573a",
   // redirectUrlForIssuer: "http://localhost:3000/issue",
 };
@@ -287,15 +287,15 @@ export default function RecruiterPage() {
   const verifierMapping = {
     "1+": {
       salary: "< $20,000",
-      verifier: "CredifyVerifier_1=c21hi031dmpll0012916hZ",
+      verifier: "CredifyVerifier_1=c21hi030di5ex00b2916hU",
     },
     "2+": {
       salary: "< $30,000",
-      verifier: "CredifyVerifier_2=c21hi031do5xf0002916Fm",
+      verifier: "CredifyVerifier_2=c21hi030dj6oe00c2916k7",
     },
     "3+": {
       salary: "< $40,000",
-      verifier: "CredifyVerifier_3=c21hi031dpn9l0012916FD",
+      verifier: "CredifyVerifier_3=c21hi030dkjgu00d291615",
     },
   };
 
