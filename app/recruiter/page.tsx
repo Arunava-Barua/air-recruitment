@@ -118,7 +118,8 @@ const candidates = [
   {
     id: 1,
     name: "Sarah Johnson",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     location: "San Francisco, CA",
     tags: ["React", "TypeScript", "Node.js", "AWS"],
     hasVerifiedDegree: true,
@@ -624,15 +625,41 @@ export default function RecruiterPage() {
               )}
 
               {verificationResult && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="text-green-800 font-medium">
+                <div
+                  className={
+                    verificationResult.status == "Non-Compliant"
+                      ? "bg-red-50 border border-red-200 rounded-lg p-4"
+                      : "bg-green-50 border border-green-200 rounded-lg p-4"
+                  }
+                >
+                  <p
+                    className={
+                      verificationResult.status == "Non-Compliant"
+                        ? "text-red-800 font-medium"
+                        : "text-green-800 font-medium"
+                    }
+                  >
                     Verification Status: {verificationResult.status}
                   </p>
                   <details className="mt-2">
-                    <summary className="text-sm text-green-700 cursor-pointer">
+                    <summary
+                      className={
+                        verificationResult.status == "Non-Compliant"
+                          ? // verificationResult.status == "Non-Compliant"
+                            "text-sm text-red-300 cursor-pointer"
+                          : "text-sm text-green-700 cursor-pointer"
+                      }
+                    >
                       View Details
                     </summary>
-                    <pre className="text-xs text-green-600 mt-2 whitespace-pre-wrap">
+                    <pre
+                      className={
+                        verificationResult.status == "Non-Compliant"
+                          ? // verificationResult.status == "Non-Compliant"
+                            "text-xs text-red-600 mt-2 whitespace-pre-wrap"
+                          : "text-xs text-green-600 mt-2 whitespace-pre-wrap"
+                      }
+                    >
                       {JSON.stringify(verificationResult, null, 2)}
                     </pre>
                   </details>
