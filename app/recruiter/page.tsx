@@ -118,7 +118,7 @@ const candidates = [
   {
     id: 1,
     name: "Sarah Johnson",
-    avatar: "/placeholder.svg?height=60&width=60",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     location: "San Francisco, CA",
     tags: ["React", "TypeScript", "Node.js", "AWS"],
     hasVerifiedDegree: true,
@@ -155,7 +155,8 @@ const candidates = [
   {
     id: 2,
     name: "Michael Chen",
-    avatar: "/placeholder.svg?height=60&width=60",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     location: "Seattle, WA",
     tags: ["Python", "Machine Learning", "TensorFlow", "Docker"],
     hasVerifiedDegree: true,
@@ -179,7 +180,8 @@ const candidates = [
   {
     id: 3,
     name: "Emily Rodriguez",
-    avatar: "/placeholder.svg?height=60&width=60",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
     location: "Austin, TX",
     tags: ["Java", "Spring", "Microservices", "Kubernetes"],
     hasVerifiedDegree: false,
